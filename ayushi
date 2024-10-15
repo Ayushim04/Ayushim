@@ -1,0 +1,99 @@
+import mysql.connector as sql
+
+#insert records stock
+def insertstock():
+     mydb=sql.connect(user='root', passwd='rlb',host='localhost', database='avenger')
+     if mydb.is_connected():
+          c=mydb.cursor()
+          while True:
+               i=int(input('enter id'))
+               if len(str(i))<=5:
+                     break
+               print('Invalid id')
+          n=input('enter product name')
+          b=input('enter brand name')
+          q=int(input('enter quantity'))
+          p=int(input('enter price per piece'))
+          a='insert into stock values ({},"{}","{}",{},{}) ; '.format (i,n,b,q,p)
+          c.execute(a)
+          mydb.commit()
+          print('your data has been successfully entered')
+     mydb.close()
+#insert records in customer
+def in_cus(): 
+      mydb=sql.connect(user='root', passwd='rlb',
+                                       host='localhost', database='avenger')
+      c1=mydb.cursor()
+      while True:
+            ci=int(input('enter cid'))
+            if len(str(ci))<=5:
+                  break
+            print('Invalid cid')
+      cn=input('enter customer name')
+      while True:
+            p=int(input('enter phone number'))
+            if len(str(p))==10 and str(p).isdigit():
+                  break
+            else:
+                  print('enter valid mobile number')
+      pn=input("enter product name")
+      while True:
+               qt=int(input('enter quantity'))
+               c1.execute('select mrp , qty from stock where pname=''{}'';'.format(pn))
+               x=c1.fetchone()
+               if qt <= x[-1]:
+                     break
+               print('quantity not available')
+      mr=x[0]
+      tamt=qt*mr
+      a='insert into customer  values({},"{}","{}","{}",{},{},{});'.format  (ci,cn,p,pn,qt,mr,tamt)
+      c1.execute(a)
+      c1.execute("update stock set qty=qty-{} where pname='{}'".format(qt, pn))
+      mydb.commit()
+      print('your data has been successfully entered')
+      mydb.close()
+#display details of stock or customer
+def displayall(d):
+      mydb=sql.connect(user='root', passwd='rlb', 
+                                       host='localhost', database='avenger')
+      c1=mydb.cursor()
+      a="select * from {};".format(d)
+      c1.execute(a)
+      for i in c1.fetchall():
+            print(i)
+      mydb.close()
+
+#display quantity of the following product left or sold
+def dis_1(e):
+      mydb=sql.connect(user='root', passwd='rlb', 
+                                       host='localhost', database='avenger')
+      c=mydb.cursor()
+      c.execute('select pname,qty from {};'.format(e))
+      for i in c.fetchall():
+            print(i)
+      mydb.close()
+
+#display brand information (stock)
+def dis_2():
+      mydb=sql.connect(user='root', passwd='rlb',
+                                       host='localhost', database='avenger')
+      c=mydb.cursor()
+      while 1:
+            a=input ('enter brand name ')
+            c.execute('select pname , mrp from stock where brand="{}"'.format (brand))
+            if  c.fetchall() != ():
+                  for i in  c.fetchall():
+                        print (i)
+            else :
+                  print('brand not found')
+      mydb.close()
+#update the mrp of given brand products (stock)
+def update():
+      mydb=sql.connect(user='root', passwd='rlb', 
+                                       host='localhost', database='avenger')
+      c=mydb.cursor()
+      a=input('enter brand whose mrp has to be increased')
+      b=int(input ('percent by which mrp should increased'))
+      c.execute('update stock set mrp=mrp*({}/100) where brand ="natraj";'.format(a,b))
+      print('updation done')
+      mydb.close()
